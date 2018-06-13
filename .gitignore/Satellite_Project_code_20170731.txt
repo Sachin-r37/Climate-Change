@@ -1,0 +1,27 @@
+# Read the data containing standard deviation
+NDVI_std_dev <- read.csv("C:/Users/Sachin.R/Desktop/Sachin/UTD/Satellite project/csv/NDVI_std_dev.csv",sep=",",header=T)
+
+# Read the data containing unique standard deviation values with their corresponding normalised cluster factor 
+NDVI_cluster_unique_sort_updated <- read.csv("C:/Users/Sachin.R/Desktop/Sachin/UTD/Satellite project/csv/NDVI_cluster_unique_sort_updated.csv",sep=",",header=T)
+
+# Data is treated as matrix 
+NDVI_std_dev.mat <- as.matrix(NDVI_std_dev)
+
+# if data contains any cell with 'NA', then it is replaced with '-1'
+NDVI_std_dev.mat[is.na(NDVI_std_dev.mat)] <- -1
+
+# below nested for loop will replace the standard deviation value with the cluster factor 
+for(i in 1:nrow(NDVI_std_dev.mat))
+{
+  for(j in 1:ncol(NDVI_std_dev.mat))
+  {
+   for(x in 1:nrow(NDVI_cluster_unique_sort_updated))
+   {
+    if(NDVI_std_dev.mat[i,j]==NDVI_cluster_unique_sort_updated[x,2])
+    {
+	 # replace the standard deviation value with the cluster factor
+     NDVI_std_dev.mat[i,j] <- NDVI_cluster_unique_sort_updated[x,3]
+    }
+   }
+  }
+ }
