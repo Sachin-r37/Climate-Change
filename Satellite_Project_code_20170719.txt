@@ -1,0 +1,89 @@
+# To run clustering on Standard deviation values obtained per pixel over time
+
+# working directory path
+wd <- "C:/Users/Sachin.R/Desktop/Sachin/UTD/Satellite project/"
+# folder where files are kept
+main_folder <- "csv/"
+
+# Read standard deviation value stored in the folder
+NDVI_std_dev <- read.csv(paste(wd,main_folder,"NDVI_std_dev.csv",sep=""),header=T,sep=",")
+
+# data is treated as matrix
+NDVI_std_dev.mat <- as.matrix(NDVI_std_dev)
+
+# First column is not considered as it contains row number, which is not a actual data
+NDVI_std_dev.mat <- NDVI_std_dev.mat[,2:3601]
+
+# NDVI_std_dev.mat[222,3600] 
+
+# If position in the matrix "NDVI_std_dev.mat" contains "NA" is replaced by "-1"
+NDVI_std_dev.mat[is.na(NDVI_std_dev.mat)] <- -1
+
+# below  variable is initialized with "-1" as a dummy first value
+NDVI_std_dev.land <- -1
+
+# for loop to run for all 1800 rows of grids 
+for (x in 1:1800)
+{
+# for loop to run for all 3600 columns of grids
+ for (y in 1:3600)
+ {
+ # value of the cell is checked against 'NA' to check for land areas 
+  if(NDVI_std_dev.mat[x,y] != -1) 
+  { 
+   # "NDVI_std_dev.land" will collect all the standard deviation values corresponding to the land area
+   NDVI_std_dev.land <- c(NDVI_std_dev.land,as.vector(NDVI_std_dev.mat[x,y]))
+  }
+ }
+}
+
+# Dummy First initial value is removed, as "NDVI_std_dev.land" contains actual data now
+NDVI_std_dev.land <- NDVI_std_dev.land[2:length(NDVI_std_dev.land)]
+
+# Seed is initialized to get consistent output
+set.seed(37)
+
+# K means clustering is performed on standard deviation values of the land area. 10 clusters are considered for initial analysis
+K_cluster <- kmeans(NDVI_std_dev.land,10)
+
+# Vector is converted in to matrix for easy storage in excel file
+NDVI_std_dev.land.mat <- matrix(NDVI_std_dev.land,(length(NDVI_std_dev.land)/5),5)
+
+# vector containing standard deviation values are stored in the excel file for reuse
+write.csv(NDVI_std_dev.land.mat,paste(wd,main_folder,"NDVI_std_dev_Land_vector.csv",sep=""))
+
+# cluster factor corresponding to each standard deviation is stored in "cluster_vector"
+cluster_vector <- K_cluster$cluster
+
+# Both standard deviation and its corresponding cluster factor are stored in a data frame   
+NDVI_cluster <- data.frame(v1=NDVI_std_dev.land,v2=cluster_vector)
+
+# vector is initialized to store unique standard deviation values
+NDVI_std_dev.unique  <- -1
+
+# Matrix is initialized to store unique standard deviation value with the corresponding cluster factor
+NDVI_cluster.unique <- matrix(c(-1,-1),1,2)
+
+NDVI_cluster <- as.matrix(NDVI_cluster)
+
+# to find unique standard deviation values and its cluster factor
+for(j in 1:nrow(NDVI_cluster))
+{
+ if(!(NDVI_cluster[j,1] %in% NDVI_std_dev.unique))
+ {
+ # "NDVI_std_dev.unique" variable is used to store vector of unique standard deviation values
+  NDVI_std_dev.unique <- c(NDVI_std_dev.unique,NDVI_cluster[j,1])
+ # "NDVI_cluster.unique" is a matrix variable and is used to store unique standard deviation value 
+ # with its corresponding cluster factor
+  NDVI_cluster.unique <- rbind(NDVI_cluster.unique,NDVI_cluster[j,])
+ }
+}
+
+ 
+# Initialized first row is dropped
+NDVI_cluster.unique <- NDVI_cluster.unique[2:length(NDVI_cluster.unique),]
+
+
+
+
+
