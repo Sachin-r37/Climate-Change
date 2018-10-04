@@ -1,0 +1,38 @@
+# Purpose of the below code is to get distinct NDVI values present in the file.
+#
+# working directory path
+wd <- "C:/Users/Sachin.R/Desktop/Sachin/UTD/Satellite project/"
+# folder where files are kept
+folder <- "csv/MOD13A2_M_NDVI/"
+# used to store dummy data 
+path <- paste(wd,folder,"MOD13A2_M_NDVI_2000-02.CSV",sep="")
+# to read the data from the file
+data <- read.csv(path,header=F,sep=",")
+# to store as a matrix
+data <- as.matrix(data)
+# to store number of grids with actual NDVI value. Initialized with zero.
+number_grids <-0
+# number of distinct NDVI values
+NDVI_distinct <- c(2)
+n<-1
+# for loop to run for all 1800 rows of grids 
+for (x in 1:1800)
+{
+# for loop to run for all 3600 columns of grids
+ for (y in 1:3600)
+ {
+ # value of the cell is checked against '99999' to check for land areas 
+  if(data[x,y] != 99999) 
+  { 
+   number_grids=number_grids+1
+  }
+  if(!(data[x,y] %in% NDVI_distinct))  
+  {
+   temp_distinct <- data[x,y]
+   NDVI_distinct <- c(NDVI_distinct,temp_distinct) 
+  }
+ }
+}
+# sort the distinct values in descending order
+NDVI_distinct <- sort(NDVI_distinct,decreasing=T)
+

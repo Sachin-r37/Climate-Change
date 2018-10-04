@@ -1,0 +1,13 @@
+# working directory path
+wd <- "C:/Users/Sachin.R/Desktop/Sachin/UTD/Satellite project/"
+# folder where files are kept
+folder <- "csv/MOD13A2_M_NDVI/"
+# used to store dummy data 
+path <- paste(wd,folder,"MOD13A2_M_NDVI_2000-02.CSV",sep="")
+# to read the data from the file
+data <- read.csv(path,header=F,sep=",")
+# to store as a matrix
+data <- as.matrix(data)
+
+clusters <-	hclust(dist(data))
+plot(clusters)

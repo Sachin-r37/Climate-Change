@@ -1,0 +1,92 @@
+# working directory path
+wd <- "C:/Users/Sachin.R/Desktop/Sachin/UTD/Satellite project/"
+# folder where files are kept
+folder <- "csv/MOD13A2_M_NDVI/"
+# used to store dummy data 
+path <- paste(wd,folder,"MOD13A2_M_NDVI_2000-02.CSV",sep="")
+# to read the data from the file
+data <- read.csv(path,header=F,sep=",")
+# to store as a matrix
+data <- as.matrix(data)
+# to store number of grids with actual NDVI value. Initialized with zero.
+number_grids <-0
+# for loop to run for all 1800 rows of grids 
+for (x in 1:1800)
+{
+# for loop to run for all 3600 columns of grids
+ for (y in 1:3600)
+ {
+ # value of the cell is checked against '99999' to check for land areas 
+  if(data[x,y] != 99999) 
+  { 
+   number_grids=number_grids+1
+  }
+ }
+}
+# All the grids or cell or pixel apart from land are filled with value 'NA'
+data[data>2] <- NA
+# 'z_axis_Count' is used to create 3 dimensional array of files with matrix data. initialised with '1' to account for first dummy data
+z_axis_count <- 1
+# Sum of all NDVI values of each land area grid or cell or pixel
+NDVI_sum <- 0
+
+# NDVI monthly average over the time period, stores as array
+NDVI_Month_avg <- 0
+
+# Average NDVI value of the earth per year
+NDVI_Year_avg <- 0
+# for loop to cover the years under analysis
+for (year in c("2000","2001","2016"))
+{
+
+# Average NDVI value of the earth per month
+NDVI_avg <- 0
+
+# for loop to cover months under analysis
+# Data for January 2000 was not present, So data of February 2000 is copied and used as Jan 2000
+# Similarly May 2016 data was not present hence Data of april 2016 is copied and used as May 2016
+# similarly July 2016 was not present hence June 2016 data is used 
+ for (month in c("01","02","03","04","05","06","07","08","09","10","11","12"))
+ {
+ # 'filepath' is dynamically generated to fetch the file on each iteration
+  filepath <- paste(wd,folder,"MOD13A2_M_NDVI_",year,"-",month,".csv",sep="")
+  print(filepath)
+  # Data is read from each file
+  sdata <- read.csv(filepath,header=F,sep=",")
+  # data is stored as matrix
+  sdata <- as.matrix(sdata)
+  # All the grids or cell or pixel apart from land are filled with value 'NA'
+  sdata[sdata>2] <- NA
+  # tempoeary summ of all NDVI values per month
+  temp_sum <- sum(sdata,na.rm=T)
+  # temorary average of NDVI value per month 
+  temp_avg <- (temp_sum/number_grids)
+  # average NDVI value of each month is stored in a array
+  NDVI_avg <- c(NDVI_avg,temp_avg)
+  # Sum of NDVI values of all months are stored in a array
+  NDVI_sum <- c(NDVI_sum,temp_sum)
+  # All the data in each file is stored as a array
+  data <- c(data,sdata)
+  z_axis_count <- z_axis_count+1
+ }
+ 
+ # to calculate yearly avg of NDVI values
+ NDVI_Year_temp <- sum(NDVI_avg)/11
+ NDVI_Month_avg <- c(NDVI_Month_avg,NDVI_avg[2:12])
+ NDVI_Year_avg <- c(NDVI_Year_avg,NDVI_Year_temp)
+ 
+}
+# data is stored as 3 dimensional array
+threed_data <- array(data,c(1800,3600,z_axis_count))
+# subset of array is taken - as first value is a dummy 
+NDVI_sum <- NDVI_sum[2:z_axis_count+1]
+plot(NDVI_Month_avg,main="NDVI Monthly average plot",xlab="Month",ylab="Average of NDVI")
+plot(NDVI_Year_avg,main="NDVI Yearly Average plot",xlab="Year",ylab="Average of NDVI")
+
+
+ 
+
+
+
+
+
