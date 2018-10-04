@@ -1,0 +1,14 @@
+# To draw heat map using standard deviation values
+# working directory path
+wd <- "C:/Users/Sachin.R/Desktop/Sachin/UTD/Satellite project/"
+# folder where files are kept
+main_folder <- "csv/"
+
+# to read the data from the file
+NDVI_std_dev <- read.csv(paste(wd,main_folder,"NDVI_std_dev.csv",sep=""),header=T,sep=",")
+NDVI_std_dev <- as.matrix(NDVI_std_dev)
+NDVI_std_dev <- NDVI_std_dev[,2:ncol(NDVI_std_dev)]
+# In order draw image using matrix with more details and flexibility below package is used
+library(pheatmap)
+# below function is used to convert a matrix in to image. 
+outputimage <- pheatmap(NDVI_std_dev, cluster_row = FALSE, cluster_col = FALSE, color = colorRampPalette(c("white","green"))(256))
