@@ -1,0 +1,28 @@
+ NDVI_std_dev.land.mat <- read.csv("C:/Users/Sachin.R/Desktop/Sachin/UTD/Satellite project/csv/NDVI_std_dev_Land_vector.csv",sep=",",header=T)
+ #head(NDVI_std_dev.land.mat)
+ NDVI_std_dev.land.mat <- as.matrix(NDVI_std_dev.land.mat )
+ NDVI_std_dev.land.mat <- NDVI_std_dev.land.mat[,2:6]
+ NDVI_std_dev.land <- as.vector(NDVI_std_dev.land.mat)
+ K_cluster <- kmeans(NDVI_std_dev.land,10)
+ cluster_vector <- K_cluster$cluster
+
+# Both standard deviation and its corresponding cluster factor are stored in a data frame   
+NDVI_cluster <- data.frame(v1=NDVI_std_dev.land,v2=cluster_vector)
+# vector is initialized to store unique standard deviation values
+NDVI_std_dev.unique  <- -1
+
+# Matrix is initialized to store unique standard deviation value with the corresponding cluster factor
+NDVI_cluster.unique <- matrix(c(-1,-1),1,2)
+
+NDVI_cluster <- as.matrix(NDVI_cluster)
+
+# to find unique standard deviation values and its cluster factor
+for(j in 1:nrow(NDVI_cluster))
+{
+ if(!(NDVI_cluster[j,1] %in% NDVI_std_dev.unique))
+ {
+  NDVI_std_dev.unique <- c(NDVI_std_dev.unique,NDVI_cluster[j,1])
+  NDVI_cluster.unique <- rbind(NDVI_cluster.unique,NDVI_cluster[j,])
+ }
+}
+NDVI_cluster.unique <- NDVI_cluster.unique[2:length(NDVI_cluster.unique),]
