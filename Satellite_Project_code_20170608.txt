@@ -1,0 +1,35 @@
+
+# "magick" package is used to read and process the images.
+library(magick)
+# working directory for satellite project.
+wd <- "C:/Users/Sachin.R/Desktop/Sachin/UTD/Satellite project/"
+# folder inside the working directory
+folder <- "rgb/MOD13A2_M_NDVI"
+# default "magick" image object used to construct the array of magick image object. 
+fin <- image_read(paste(wd,"MOD13A2_M_NDVI_2000-01.PNG",sep="/"))
+fin <- image_crop(fin,"400x450+2400+450")
+
+# the years for which data is available
+for (year in c("2000"))
+{
+# months of the year
+for(month in c("01","02","03","04","05","06","07","08","09","10","11","12"))
+  {
+  # time stamp is used to display the corresponding month and year of the image in gif.
+  timestamp <- paste(year,month,sep="-")
+  # path of the file to be read is dynamically constructed to read all files in the folder.
+  filepath <- paste(wd,folder,"/MOD13A2_M_NDVI_",timestamp,".PNG",sep="")
+  # function to read the images
+  img <- image_read(filepath)
+  # image is cropped to focus the area 
+  img <- image_crop(img,"400x450+2400+450")
+  # Text is added in the image to relate the image with its corresponding month and year of data.
+  img <- image_annotate(img,timestamp,color="white",size=50,gravity="north",location="+800+500")
+  # 'fin' is the array of magick image object, helpful to create the gif.
+  fin <- c(fin,img)
+  }
+}
+gif <- image_animate(fin,fps=1)
+image_browse(gif)
+image_write(gif,"C:/Users/Sachin.R/Desktop/Sachin/UTD/Satellite project/earth2000.gif")
+
